@@ -1,40 +1,77 @@
-import { useAppDispatch } from "@/redux/hook";
+// import { useAppDispatch } from "@/redux/hook";
 import { Button } from "../ui/button";
 import { removeTodo, toggleComplete } from "@/redux/features/todoSlice";
+import { useDeleteTodoMutation, useUpdateTodoMutation } from "@/redux/api/api";
 type TTodoCardProps = {
-  id: string;
+  _id: string;
   title: string;
   description: string;
   isCompleted?: boolean;
+  priority: string;
 };
-const TodoCard = ({ title, description, id, isCompleted }: TTodoCardProps) => {
-  const dispatch = useAppDispatch();
+const TodoCard = ({
+  title,
+  description,
+  _id,
+  isCompleted,
+  priority,
+}: TTodoCardProps) => {
+  const [updateTodo, { isLoading }] = useUpdateTodoMutation();
+  const [deleteTodo] = useDeleteTodoMutation();
+  // const dispatch = useAppDispatch();
   const toggleState = () => {
     // console.log("clicked");
-    dispatch(toggleComplete(id));
+    // dispatch(toggleComplete(id));
+    const taskData = {
+      title,
+      description,
+      priority,
+      isCompleted: !isCompleted,
+    };
+    const options = {
+      id: _id,
+      data: taskData,
+    };
+    // console.log(taskData);
+    updateTodo(options);
   };
   return (
     <div>
-      <div className="bg-white rounded-md flex justify-between item-center p-3 border">
-        <input
-          onChange={toggleState}
-          type="checkbox"
-          name="complete"
-          id="complete"
-        />
-        <p className="font-semibold">{title}</p>
-        {/* <p>Time</p> */}
-        <div>
+      <div className="bg-white rounded-md flex justify-between items-center p-3 border gap-1">
+        <div className="flex flex-row justify-center items-center flex-1">
+          <input
+            onChange={toggleState}
+            type="checkbox"
+            name="complete"
+            id="complete"
+            defaultChecked={isCompleted}
+          />
+          <p className="font-semibold flex-1 ml-2">{title}</p>
+        </div>
+        <div className="flex-1 flex items-center justify-start pl-7 gap-2">
+          <div
+            className={`size-3 rounded-full
+          ${priority === "high" ? "bg-red-500" : null}
+          ${priority === "medium" ? "bg-yellow-500" : null}
+          ${priority === "low" ? "bg-green-500" : null}
+          `}
+          ></div>
+          <p>{priority}</p>
+        </div>
+        <div className="flex-1">
           {isCompleted ? (
             <p className="text-green-500">Done</p>
           ) : (
             <p className="text-red-500">Pending</p>
           )}
         </div>
-        <p>{description}</p>
-        <div className="space-x-5">
+        <p className="flex-[2]">{description}</p>
+        <div className="space-x-5 flex-1">
           <Button
-            onClick={() => dispatch(removeTodo(id))}
+            onClick={() => {
+              console.log(_id);
+              deleteTodo(_id);
+            }}
             className="bg-red-500"
           >
             <svg

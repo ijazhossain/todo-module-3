@@ -1,6 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
-type TTodo = {
+export type TTodo = {
   id: string;
   title: string;
   description: string;
